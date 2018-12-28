@@ -36,7 +36,27 @@ main = hspec $ do
       it "Candidates [x] should be False" $ do
         isConfirmed (Candidates []) `shouldBe` False
   
-
+    describe "updateCell" $ do
+      context "case Confirmed A and Confirmed B" $ do
+        it "should be Confirmed B" $ do
+          updateCell (Confirmed 1) (Confirmed 2) `shouldBe` (Confirmed 2)
+      context "case Candidates X and Confirmed B" $ do
+        it "should be Confirmed B" $ do
+          updateCell (Candidates []) (Confirmed 2) `shouldBe` (Confirmed 2)
+      context "case Confirmed A and Candidates X" $ do
+        it "should be Confirmed A" $ do
+          updateCell (Confirmed 1) (Candidates [1]) `shouldBe` (Confirmed 1)
+      context "case Candidates [x,y] and Candidates [x]" $ do
+        it "should be Candidates [y]" $ do
+          updateCell (Candidates [1,2]) (Candidates [1]) `shouldBe` (Candidates [2])
+      context "case Candidates [x,y] and Candidates [z]" $ do
+        it "should be Candidates [x,y]" $ do
+          updateCell (Candidates [1,2]) (Candidates [3]) `shouldBe` (Candidates [1,2])
+      context "case Candidates [] and Candidates [x]" $ do
+        it "should be Candidates []" $ do
+          updateCell (Candidates []) (Candidates [1]) `shouldBe` (Candidates [])
+                
+    
 
 
 

@@ -41,3 +41,9 @@ emptyCell = Candidates [1..9]
 
 emptyBoard :: Board
 emptyBoard = Board $ array ((1,1), (9,9)) $ zip positions $ repeat emptyCell
+
+updateCell :: Cell -> Cell -> Cell
+updateCell _ b@(Confirmed _) = b
+updateCell a@(Confirmed _) _ = a
+updateCell (Candidates xs) (Candidates ys) = Candidates $ foldr f xs ys
+    where f y xs' = filter (/=y) xs'
