@@ -16,6 +16,7 @@ data Cell = Confirmed Int -- 確定した数
             deriving (Show, Eq)
 
 type Pos = (Int, Int)
+type PosCell = (Pos, Cell)
 
 data Board = Board (Array Pos Cell) deriving Show
 
@@ -47,3 +48,26 @@ updateCell _ b@(Confirmed _) = b
 updateCell a@(Confirmed _) _ = a
 updateCell (Candidates xs) (Candidates ys) = Candidates $ foldr f xs ys
     where f y xs' = filter (/=y) xs'
+
+candiatesCell :: PosCell -> [PosCell]
+candiatesCell pc@(_, (Candidates _)) = [pc]
+candiatesCell pc@((y, x), (Confirmed n)) = pc : row ++ col ++ sec
+    where row = candiatesRow pc
+          col = candiatesCol pc
+          sec = candiatesSec pc
+
+candiatesRow :: PosCell -> [PosCell]
+candiatesRow pc@(_, (Candidates _)) = []
+candiatesRow ((y, _), (Confirmed n)) = [((y, x), Candidates [n]) | x <- [1..9]]
+
+candiatesCol :: PosCell -> [PosCell]
+candiatesCol pc@(_, (Candidates _)) = []
+candiatesCol ((_, x), (Confirmed n)) = [((y, x), Candidates [n]) | y <- [1..9]]
+
+candiatesSec :: PosCell -> [PosCell]
+candiatesSec pc@(_, (Candidates _)) = []
+candiatesSec ((y, x), (Confirmed n)) = [((y' + dy, x' + dx), Candidates [n]) | dy <- [1..3], dx <- [1..3]]
+    where base a = (a - 1) `div` 3 * 3
+          x' = base x
+          y' = base y
+

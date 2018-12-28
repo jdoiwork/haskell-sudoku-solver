@@ -56,8 +56,29 @@ main = hspec $ do
         it "should be Candidates []" $ do
           updateCell (Candidates []) (Candidates [1]) `shouldBe` (Candidates [])
                 
-    
-
+    describe "candiatesSec" $ do
+      context "case ((1,1), Confirmed 1)" $ do
+        it "should be section1 positions and all cells are Candiates [1]" $ do
+          candiatesSec ((1,1), Confirmed 1) `shouldBe`
+            [ ((1,1), Candidates [1]), ((1,2), Candidates [1]), ((1,3), Candidates [1])
+            , ((2,1), Candidates [1]), ((2,2), Candidates [1]), ((2,3), Candidates [1])
+            , ((3,1), Candidates [1]), ((3,2), Candidates [1]), ((3,3), Candidates [1])
+            ]
+      context "case ((5,5), Confirmed 7)" $ do
+        it "should be section5 positions and all cells are Candiates [7]" $ do
+          candiatesSec ((5,5), Confirmed 7) `shouldBe`
+            [ ((4,4), Candidates [7]), ((4,5), Candidates [7]), ((4,6), Candidates [7])
+            , ((5,4), Candidates [7]), ((5,5), Candidates [7]), ((5,6), Candidates [7])
+            , ((6,4), Candidates [7]), ((6,5), Candidates [7]), ((6,6), Candidates [7])
+            ]
+      context "case ((7,9), Confirmed 8)" $ do
+        it "should be section9 positions and all cells are Candiates [8]" $ do
+          candiatesSec ((7,9), Confirmed 8) `shouldBe`
+            [ ((7,7), Candidates [8]), ((7,8), Candidates [8]), ((7,9), Candidates [8])
+            , ((8,7), Candidates [8]), ((8,8), Candidates [8]), ((8,9), Candidates [8])
+            , ((9,7), Candidates [8]), ((9,8), Candidates [8]), ((9,9), Candidates [8])
+            ]
+            
 
 
       
