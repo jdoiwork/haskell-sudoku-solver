@@ -36,3 +36,5 @@ isConfirmed :: Cell -> Bool
 isConfirmed (Confirmed _) = True
 isConfirmed _ = False
 
+emptyCell :: Cell
+emptyCell = Candidates [1..9]
