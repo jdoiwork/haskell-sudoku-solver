@@ -1,16 +1,7 @@
-module Lib {-
-    ( someFunc
-    , positions
-    , parseNumber
-    , Cell(..)
-    , isConfirmed
-    ) -} where
+module Lib where
 
 import Data.Array
 import Data.List (sortOn, partition)
-
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
 
 data Cell = Confirmed Int -- 確定した数
           | Candidates [Int] -- 候補の数
@@ -116,20 +107,28 @@ showCell :: Cell -> Char
 showCell (Confirmed n) = head $ show n
 showCell _             = ' '
 
-sampleSrc :: [String]
-sampleSrc = [ "5176   34" -- 1
-            , "289  4   " -- 2
-            , "3462 5 9 " -- 3
-            , "6 2    1 " -- 4
-            , " 38  6 47" -- 5
-            , "         " -- 6
-            , " 9     78" -- 7
-            , "7034  56 " -- 8
-            , "         " -- 9
-            ]
+isValidSource :: String -> Bool
+isValidSource s = rowOK && all colOK rows
+    where rows = take n $ lines s
+          rowOK = n == length rows
+          colOK r = n == length r
+          n = 9
 
-sampleSrc2 :: [String]
-sampleSrc2 =
+sampleSrc :: String
+sampleSrc = unlines
+    [ "5176   34" -- 1
+    , "289  4   " -- 2
+    , "3462 5 9 " -- 3
+    , "6 2    1 " -- 4
+    , " 38  6 47" -- 5
+    , "         " -- 6
+    , " 9     78" -- 7
+    , "7034  56 " -- 8
+    , "         " -- 9
+    ]
+
+sampleSrc2 :: String
+sampleSrc2 = unlines
     [ "850002400" -- 1
     , "720000009" -- 2
     , "004000000" -- 3
@@ -141,8 +140,8 @@ sampleSrc2 =
     , "000036040" -- 9
     ]
 
-sampleSrc3 :: [String]
-sampleSrc3 =
+sampleSrc3 :: String
+sampleSrc3 = unlines
     [ "370001000" -- 1
     , "000902000" -- 2
     , "000006510" -- 3
@@ -155,10 +154,10 @@ sampleSrc3 =
     ]
 
 sampleBoard :: Board
-sampleBoard = parseBoard $ unlines sampleSrc
+sampleBoard = parseBoard sampleSrc
 
 sampleBoard2 :: Board
-sampleBoard2 = parseBoard $ unlines sampleSrc2
+sampleBoard2 = parseBoard sampleSrc2
 
 sampleBoard3 :: Board
-sampleBoard3 = parseBoard $ unlines sampleSrc3
+sampleBoard3 = parseBoard sampleSrc3

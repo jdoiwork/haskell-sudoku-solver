@@ -28,7 +28,7 @@ library:
   - array
 
 executables:
-  sudoku-solver-exe:
+  sudoku-solver:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
