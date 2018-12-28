@@ -1,10 +1,10 @@
-module Lib
+module Lib {-
     ( someFunc
     , positions
     , parseNumber
     , Cell(..)
     , isConfirmed
-    ) where
+    ) -} where
 
 import Data.Array
 
@@ -26,7 +26,7 @@ positions = do
     return (y, x)
 
 parseBoard :: String -> Board
-parseBoard s = undefined
+parseBoard s = emptyBoard
 
 parseNumber :: Char -> Cell
 parseNumber c | '1' <= c && c <= '9' = Confirmed $ read $ c:[]
@@ -38,3 +38,6 @@ isConfirmed _ = False
 
 emptyCell :: Cell
 emptyCell = Candidates [1..9]
+
+emptyBoard :: Board
+emptyBoard = Board $ array ((1,1), (9,9)) $ zip positions $ repeat emptyCell
