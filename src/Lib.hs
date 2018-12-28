@@ -30,7 +30,7 @@ parseBoard s = undefined
 
 parseNumber :: Char -> Cell
 parseNumber c | '1' <= c && c <= '9' = Confirmed $ read $ c:[]
-              | otherwise            = Candidates [1..9]
+              | otherwise            = emptyCell
 
 isConfirmed :: Cell -> Bool
 isConfirmed (Confirmed _) = True
