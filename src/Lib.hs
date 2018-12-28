@@ -106,6 +106,16 @@ take9s :: [a] -> [[a]]
 take9s [] = []
 take9s xs = take 9 xs : take9s (drop 9 xs)
 
+showBoard :: Board -> String
+showBoard (Board b) = unlines $ map showRow $ take9s $ elems b
+
+showRow :: [Cell] -> String
+showRow = map showCell
+
+showCell :: Cell -> Char
+showCell (Confirmed n) = head $ show n
+showCell _             = ' '
+
 sampleSrc :: [String]
 sampleSrc = [ "5176   34" -- 1
             , "289  4   " -- 2
