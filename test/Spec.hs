@@ -25,9 +25,9 @@ main = hspec $ do
       it "'9' should be Confirmed 9" $ do
         parseNumber '9' `shouldBe` Confirmed 9
       it "space should be Candidates [1..9]" $ do
-        parseNumber ' ' `shouldBe` Candidates [1..9]
+        parseNumber ' ' `shouldBe` Candidates []
       it "otherwise should be Candidates [1..9]" $ do
-        parseNumber 'あ' `shouldBe` Candidates [1..9]
+        parseNumber 'あ' `shouldBe` Candidates []
                                                     
     describe "isConfirmed" $ do
       it "Confirmed x should be True" $ do
