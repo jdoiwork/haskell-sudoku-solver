@@ -7,6 +7,7 @@ module Lib {-
     ) -} where
 
 import Data.Array
+import Data.List (sortOn, partition)
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -18,7 +19,9 @@ data Cell = Confirmed Int -- 確定した数
 type Pos = (Int, Int)
 type PosCell = (Pos, Cell)
 
-data Board = Board (Array Pos Cell) deriving Show
+data Board = Board
+           { board :: (Array Pos Cell)
+           } deriving Show
 
 positions :: [Pos]
 positions = do
@@ -27,7 +30,12 @@ positions = do
     return (y, x)
 
 parseBoard :: String -> Board
-parseBoard s = emptyBoard
+parseBoard s = foldr (flip updateBoard) emptyBoard cs
+    where ns = map parseNumber $ concat $ lines s
+          cs = zip positions ns
+
+updateBoard :: Board -> PosCell -> Board
+updateBoard (Board b) pc = Board $ accum updateCell b $ candiatesCell pc
 
 parseNumber :: Char -> Cell
 parseNumber c | '1' <= c && c <= '9' = Confirmed $ read $ c:[]
@@ -70,4 +78,42 @@ candiatesSec ((y, x), (Confirmed n)) = [((y' + dy, x' + dx), Candidates [n]) | d
     where base a = (a - 1) `div` 3 * 3
           x' = base x
           y' = base y
+
+solve :: Board -> [Board]
+solve b = solve' [b] []
+    where solve' []          solved = solved
+          solve' (x:solving) solved =
+            case next of
+                [] -> solve' solving solved
+                c:_ -> let (ns, ms) = divideWithSolved c
+                    in solve' (ms ++ solving) (ns ++ solved)
+                where next = nextCandiates x
+                      divideWithSolved pc = partition isSolved $ divide pc x
+
+isSolved :: Board -> Bool
+isSolved (Board b) = all isConfirmed $ elems b
+
+divide :: PosCell -> Board -> [Board]
+divide pc@(_, (Confirmed _)) b = undefined
+divide pc@((y,x), (Candidates ns)) b = map (updateBoard b) pcs
+    where pcs = [((y, x), Confirmed n) | n <- ns]
+
+nextCandiates :: Board -> [PosCell]
+nextCandiates (Board b) = sortOn (\(_, Candidates ns) -> length ns) cs
+    where cs = filter (not . isConfirmed . snd) $ assocs b
+
+sampleSrc :: [String]
+sampleSrc = [ "5176   34" -- 1
+            , "289  4   " -- 2
+            , "3462 5 9 " -- 3
+            , "6 2    1 " -- 4
+            , " 38  6 47" -- 5
+            , "         " -- 6
+            , " 9     78" -- 7
+            , "7034  56 " -- 8
+            , "         " -- 9
+            ]
+
+sampleBoard :: Board
+sampleBoard = parseBoard $ unlines sampleSrc
 
