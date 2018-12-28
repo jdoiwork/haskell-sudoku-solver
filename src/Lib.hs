@@ -102,6 +102,10 @@ nextCandiates :: Board -> [PosCell]
 nextCandiates (Board b) = sortOn (\(_, Candidates ns) -> length ns) cs
     where cs = filter (not . isConfirmed . snd) $ assocs b
 
+take9s :: [a] -> [[a]]
+take9s [] = []
+take9s xs = take 9 xs : take9s (drop 9 xs)
+
 sampleSrc :: [String]
 sampleSrc = [ "5176   34" -- 1
             , "289  4   " -- 2
