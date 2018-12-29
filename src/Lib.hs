@@ -76,7 +76,7 @@ candiatesSec pc@(_, (Candidates _)) = []
 solve :: Board -> [Board]
 solve b = solve' [b] []
     where solve' []       solved              = solved
-          solve' (x:rest) solved | isSolved x = solve' rest (x : solved)
+          solve' (x:rest) solved | isSolved x = [x] -- solve' rest (x : solved)
                                  | otherwise  = solve' ((nextBoards x) ++ rest) solved
           nextBoards x = concatMap (divide x) $ nextCandiate1 x
 
