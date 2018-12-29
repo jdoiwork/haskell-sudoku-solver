@@ -1,9 +1,11 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Lib where
 
-import Data.Array
-import Data.List (sortOn, partition)
+import Data.Array.IArray
+import Data.List (sortOn, partition, minimumBy)
 
-data Cell = Confirmed Int -- 確定した数
+data Cell = Confirmed !Int -- 確定した数
           | Candidates [Int] -- 候補の数
             deriving (Show, Eq)
 
@@ -11,7 +13,7 @@ type Pos = (Int, Int)
 type PosCell = (Pos, Cell)
 
 data Board = Board
-           { board :: (Array Pos Cell)
+           { board :: !(Array Pos Cell)
            } deriving Show
 
 positions :: [Pos]
@@ -45,8 +47,9 @@ emptyBoard = Board $ array ((1,1), (9,9)) $ zip positions $ repeat emptyCell
 updateCell :: Cell -> Cell -> Cell
 updateCell _ b@(Confirmed _) = b
 updateCell a@(Confirmed _) _ = a
-updateCell (Candidates xs) (Candidates ys) = Candidates $ foldr f xs ys
+updateCell (Candidates xs) (Candidates ys) = Candidates ns
     where f y xs' = filter (/=y) xs'
+          !ns = foldr f xs ys
 
 candiatesCell :: PosCell -> [PosCell]
 candiatesCell pc@(_, (Candidates _)) = [pc]
@@ -56,30 +59,32 @@ candiatesCell pc@((y, x), (Confirmed n)) = pc : row ++ col ++ sec
           sec = candiatesSec pc
 
 candiatesRow :: PosCell -> [PosCell]
-candiatesRow pc@(_, (Candidates _)) = []
 candiatesRow ((y, _), (Confirmed n)) = [((y, x), Candidates [n]) | x <- [1..9]]
+candiatesRow pc@(_, (Candidates _)) = []
 
 candiatesCol :: PosCell -> [PosCell]
-candiatesCol pc@(_, (Candidates _)) = []
 candiatesCol ((_, x), (Confirmed n)) = [((y, x), Candidates [n]) | y <- [1..9]]
+candiatesCol pc@(_, (Candidates _)) = []
 
 candiatesSec :: PosCell -> [PosCell]
-candiatesSec pc@(_, (Candidates _)) = []
 candiatesSec ((y, x), (Confirmed n)) = [((y' + dy, x' + dx), Candidates [n]) | dy <- [1..3], dx <- [1..3]]
     where base a = (a - 1) `div` 3 * 3
           x' = base x
           y' = base y
+candiatesSec pc@(_, (Candidates _)) = []
 
 solve :: Board -> [Board]
 solve b = solve' [b] []
     where solve' []          solved = solved
           solve' (x:solving) solved =
             case next of
-                [] -> solve' solving solved
-                c:_ -> let (ns, ms) = divideWithSolved c
+                Nothing -> solve' solving solved
+                Just c -> let (ns, ms) = divideWithSolved c
                     in solve' (ms ++ solving) (ns ++ solved)
-                where next = nextCandiates x
+                where next = nextCandiate1 x
                       divideWithSolved pc = partition isSolved $ divide pc x
+
+        
 
 isSolved :: Board -> Bool
 isSolved (Board b) = all isConfirmed $ elems b
@@ -92,6 +97,15 @@ divide pc@((y,x), (Candidates ns)) b = map (updateBoard b) pcs
 nextCandiates :: Board -> [PosCell]
 nextCandiates (Board b) = sortOn (\(_, Candidates ns) -> length ns) cs
     where cs = filter (not . isConfirmed . snd) $ assocs b
+
+nextCandiate1 :: Board -> Maybe PosCell
+nextCandiate1 (Board b) = case cs of
+        [] -> Nothing
+        _ -> Just $ minimumBy cmplen cs
+    where cs = filter (not . isConfirmed . snd) $ assocs b
+          cmplen (_, Candidates a) (_, Candidates b) = length a `compare` length b
+
+    
 
 take9s :: [a] -> [[a]]
 take9s [] = []
