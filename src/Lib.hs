@@ -76,15 +76,10 @@ candiatesSec pc@(_, (Candidates _)) = []
 solve :: Board -> [Board]
 solve b = solve' [b] []
     where solve' []          solved = solved
-          solve' (x:solving) solved =
-            case next of
-                Nothing -> solve' solving solved
-                Just c -> let (ns, ms) = divideWithSolved c
-                    in solve' (ms ++ solving) (ns ++ solved)
-                where next = nextCandiate1 x
-                      divideWithSolved pc = partition isSolved $ divide pc x
-
-        
+          solve' (x:rest) solved = solve' (newWorks ++ rest) (newAnswers ++ solved)
+            where next = nextCandiate1 x
+                  divideWithSolved pcs = partition isSolved $ concatMap (`divide` x) pcs
+                  (newAnswers, newWorks) = divideWithSolved next
 
 isSolved :: Board -> Bool
 isSolved (Board b) = all isConfirmed $ elems b
@@ -98,14 +93,12 @@ nextCandiates :: Board -> [PosCell]
 nextCandiates (Board b) = sortOn (\(_, Candidates ns) -> length ns) cs
     where cs = filter (not . isConfirmed . snd) $ assocs b
 
-nextCandiate1 :: Board -> Maybe PosCell
+nextCandiate1 :: Board -> [PosCell]
 nextCandiate1 (Board b) = case cs of
-        [] -> Nothing
-        _ -> Just $ minimumBy cmplen cs
+        [] -> []
+        _ -> return $ minimumBy cmplen cs
     where cs = filter (not . isConfirmed . snd) $ assocs b
           cmplen (_, Candidates a) (_, Candidates b) = length a `compare` length b
-
-    
 
 take9s :: [a] -> [[a]]
 take9s [] = []
