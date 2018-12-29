@@ -12,9 +12,9 @@ data Cell = Confirmed !Int -- 確定した数
 type Pos = (Int, Int)
 type PosCell = (Pos, Cell)
 
-data Board = Board
-           { board :: !(Array Pos Cell)
-           } deriving Show
+newtype Board = Board
+              { board :: (Array Pos Cell)
+              } deriving Show
 
 positions :: [Pos]
 positions = do
