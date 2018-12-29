@@ -75,18 +75,17 @@ candiatesSec pc@(_, (Candidates _)) = []
 
 solve :: Board -> [Board]
 solve b = solve' [b] []
-    where solve' []          solved = solved
-          solve' (x:rest) solved = solve' (newWorks ++ rest) (newAnswers ++ solved)
-            where next = nextCandiate1 x
-                  divideWithSolved pcs = partition isSolved $ concatMap (`divide` x) pcs
-                  (newAnswers, newWorks) = divideWithSolved next
+    where solve' []       solved              = solved
+          solve' (x:rest) solved | isSolved x = solve' rest (x : solved)
+                                 | otherwise  = solve' ((nextBoards x) ++ rest) solved
+          nextBoards x = concatMap (divide x) $ nextCandiate1 x
 
 isSolved :: Board -> Bool
 isSolved (Board b) = all isConfirmed $ elems b
 
-divide :: PosCell -> Board -> [Board]
-divide pc@(_, (Confirmed _)) b = undefined
-divide pc@((y,x), (Candidates ns)) b = map (updateBoard b) pcs
+divide :: Board -> PosCell -> [Board]
+divide _ pc@(_, (Confirmed _)) = []
+divide b pc@((y,x), (Candidates ns)) = map (updateBoard b) pcs
     where pcs = [((y, x), Confirmed n) | n <- ns]
 
 nextCandiates :: Board -> [PosCell]
