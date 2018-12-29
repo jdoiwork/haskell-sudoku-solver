@@ -22,6 +22,6 @@ solveFile path = do
     then do
       case solve (parseBoard file) of
         [] -> putStrLn "Cannot solve."
-        board:_ -> putStrLn $ showBoard board
+        board:_ -> putStr $ showBoard board
     else do
       putStrLn "Invalid source file."
